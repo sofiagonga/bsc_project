@@ -10,12 +10,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy as sp
 import scipy.interpolate as inter
-import time
+import math
 
 print("START!")
 size = 200
 factor = 5
-
+#spacing_grid_galaxies = 4
 
 mpc_metre = 3.085678e+22
 G = 6.67430e-11 / mpc_metre ** 3
@@ -32,29 +32,57 @@ shape = np.array([factor*size, size, size])
 k_spacing = 2 * sp.pi / shape
 
 # %%
-galaxies_clust, mass_r_source = methods.clustered_galaxies(k_vector=k_vector, max_val_norm=0.5, spacing=0.2, constant=0.01)
-print("NUM GALAXIES CLUSTERED", len(galaxies_clust))
-#methods.show_galaxies(galaxies_clust)
+galaxies_clust1, mass_r_source1 = methods.clustered_galaxies(k_vector=k_vector, max_val_norm=0.5, spacing=0.2, constant=0.01)
+print("NUM GALAXIES CLUSTERED 1", len(galaxies_clust1))
+
 galaxies_clust2, mass_r_source2 = methods.clustered_galaxies(k_vector=k_vector, max_val_norm=1, spacing=0.2, constant=0.01)
 print("NUM GALAXIES CLUSTERED 2", len(galaxies_clust2))
 
 galaxies_clust3, mass_r_source3 = methods.clustered_galaxies(k_vector=k_vector, max_val_norm=2, spacing=0.2, constant=0.01)
 print("NUM GALAXIES CLUSTERED 3", len(galaxies_clust3))
 
-plt.imshow(mass_r_source3, cmap = 'Greys') #show mass field to check
+galaxies_clust4, mass_r_source4 = methods.clustered_galaxies(k_vector=k_vector, max_val_norm=5, spacing=0.2, constant=0.01)
+print("NUM GALAXIES CLUSTERED 4", len(galaxies_clust4))
+
+#methods.show_galaxies(galaxies_clust)
+
+plt.imshow(mass_r_source1, cmap='Greys') #show mass field to check
 plt.colorbar()
-#y,x =zip(*galaxies_clust)
-#y = (-1)*np.array(y)+200
-x,y =zip(*galaxies_clust3)
-plt.scatter(x,y,s=0.1)
-plt.savefig(fname= "mass_and_galaxies_clust3.png",dpi=1200)
+x1,y1 =zip(*galaxies_clust1)
+plt.scatter(x1,y1,s=0.3)
+plt.savefig(fname= "clust1.png",dpi=1000)
+plt.show()
+
+plt.imshow(mass_r_source2, cmap='Greys') #show mass field to check
+plt.colorbar()
+x2,y2 =zip(*galaxies_clust2)
+plt.scatter(x2,y2,s=0.3)
+plt.savefig(fname= "clust2.png",dpi=1000)
+plt.show()
+
+plt.imshow(mass_r_source3, cmap='Greys') #show mass field to check
+plt.colorbar()
+x3,y3 =zip(*galaxies_clust3)
+plt.scatter(x3,y3,s=0.3)
+plt.savefig(fname= "clust3.png",dpi=1000)
+plt.show()
+
+plt.imshow(mass_r_source4, cmap='Greys') #show mass field to check
+plt.colorbar()
+x4,y4 =zip(*galaxies_clust4)
+plt.scatter(x4,y4,s=0.3)
+plt.savefig(fname= "clust4.png",dpi=1000)
 plt.show()
 
 # %%
-spacing_grid_galaxies = 2
+spacing_grid_galaxies= 2
 galaxies_grid = methods.coord_array(size, spacing_grid_galaxies)
 print("NUM GALAXIES GRID", len(galaxies_grid))
 
+x_grid, y_grid = zip(*galaxies_grid)
+plt.scatter(x_grid, y_grid, s = 0.3)
+plt.savefig(fname= "grid.png",dpi=1000)
+plt.show()
 # %%
 galaxies_rand = methods.random_galaxies(len(galaxies_clust), size)
 
@@ -70,10 +98,10 @@ Plot the grav potential in r space
 grav_pot_r = methods.convert_rspace(grav_pot_k)
 grav_pot_r = methods.rewrite(grav_pot_r)
 grav_pot_r = np.array(grav_pot_r)/c**2
-plt.xlabel('Grav Potential (for single slice)')
-plt.imshow(grav_pot_r[size//4][:][:], cmap='viridis')
-plt.savefig(fname= "grav_potential.png",dpi=1200)
+plt.xlabel('Grav Potential (slice)')
+plt.imshow(grav_pot_r[size//3][:][:], cmap='Greens')
 plt.colorbar()
+plt.savefig(fname= "grav_pot.png",dpi=1000)
 plt.show()
 
 
@@ -102,22 +130,48 @@ print("NEW DIMENSIONS OF DERIVATIVES", sp.shape(derivatives_r))
 
 # %%
 
+conv_field_back = methods.total_fields(which_field = "convergence", derivatives_r = derivatives_r, size = size)
+plt.xlabel('Conv Field background')
+plt.imshow(conv_field_back, cmap='Oranges')
+plt.colorbar()
+plt.savefig(fname= "conv_back.png",dpi=1000)
+plt.show()
+
+f = open("saveytime.py", "w")
+f.write("galaxies_clust1=" + str(galaxies_clust1))
+f.write("galaxies_clust2=" + str(galaxies_clust2))
+f.write("galaxies_clust3=" + str(galaxies_clust3))
+f.write("grav_pot_k=" + str(grav_pot_k))
+f.write("grav_pot_r=" + str(grav_pot_r))
+f.write("conv_field_back=" + str(conv_field_back))
+f.write("derivatives_k=" + str(derivatives_k))
+f.write("derivatives_r=" + str(derivatives_r))
+f.write("galaxies_grid=" + str(galaxies_grid))
+f.write("k_vector=" + str(k_vector))
+f.write("mass_r_source1=" + str(mass_r_source1))
+f.write("mass_r_source2=" + str(mass_r_source2))
+f.write("mass_r_source3=" + str(mass_r_source3))
+f.close()
+# %%
+
 """
 Obtain two point correlation function for clustered galaxies
 """
-conv_galaxies_clust =[0 for i in range(len(galaxies_clust))]
-for i in range(len(galaxies_clust)):
-    conv_galaxies_clust[i] = methods.int_field(which_field="convergence", derivatives_r=derivatives_r, size=size, source = galaxies_clust[i], observer=[size//2,size//2])
+conv_galaxies_clust1 =[0 for i in range(len(galaxies_clust1))]
+for i in range(len(galaxies_clust1)):
+    conv_galaxies_clust1[i] = methods.int_field(which_field="convergence", derivatives_r=derivatives_r, size=size, source = galaxies_clust1[i], observer=[size//2,size//2])
 
-two_point_clust = methods.two_point_statistics(galaxies_clust, conv_galaxies_clust, size)
-means_clust = []
-yerrors_clust = []
-num_pairs_clust= []
+conv_galaxies_clust1 = methods.adding_error(conv_galaxies_clust1)
 
-for i in range(0,len(two_point_clust)):
-    means_clust.append(two_point_clust[i][0])
-    yerrors_clust.append(two_point_clust[i][1])
-    num_pairs_clust.append(two_point_clust[i][2])
+two_point_clust1 = methods.two_point_statistics(galaxies_clust1, conv_galaxies_clust1, size)
+means_clust1 = []
+yerrors_clust1 = []
+num_pairs_clust1= []
+
+for i in range(0,len(two_point_clust1)):
+    means_clust1.append(two_point_clust1[i][0])
+    yerrors_clust1.append(two_point_clust1[i][1])
+    num_pairs_clust1.append(two_point_clust1[i][2])
 
 
 # %%

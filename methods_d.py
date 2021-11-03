@@ -14,7 +14,7 @@ import scipy.interpolate as inter
 import numpy.fft as fft
 import time
 import matplotlib.pyplot as plt
-import random_fields as fd
+#import random_fields as fd
 
 mpc_metre = 3.085678e+22
 G = 6.67430e-11 / mpc_metre ** 3
@@ -86,7 +86,7 @@ def k_vector_shifted(size, factor, r_spacing = 1, real= False):
 
     
 #    k_vector = np.meshgrid(k_x, k_y, k_z)
-    k_vector = sp.fftpack.fftshift(np.meshgrid(k_x, k_y, k_z))
+    k_vector = fft.fftshift(np.meshgrid(k_x, k_y, k_z))
     
     print("K-VECTOR CALCULATED")
     print("DIMENSIONS K-VECTOR", sp.shape(k_vector))
@@ -126,7 +126,7 @@ def clustered_galaxies(k_vector, max_val_norm, spacing, constant=0.005):
     Mass_r_source is the overdensity \delta
     """
     
-    alpha = 3
+#    alpha = 3
     size=len(k_vector[0])  
     positions=coord_array(size, spacing) #creates an array with all the positions on the source plane
     
@@ -143,9 +143,7 @@ def clustered_galaxies(k_vector, max_val_norm, spacing, constant=0.005):
 
 
 #    mass_r_source = normalise_range(fd.gaussian_random_field(alpha = alpha, size=size),max_val_norm=max_val_norm)
-#    plt.imshow(mass_r_source, cmap='Purples') #show mass field to check
-#    plt.colorbar()
-#    plt.show()
+    
     
     #interpolate
     x_arr = sp.arange(0,size,1)
