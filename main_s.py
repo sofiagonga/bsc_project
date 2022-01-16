@@ -24,7 +24,7 @@ c = 3e8 / mpc_metre
 
 # %%
 """
-Create 3 different types of galaxy positions: clustered, grids, random
+Create galaxies with 3 different types of clustering: clustered, grids, random
 """
 
 k_vector = methods.k_vector_shifted(size=size, factor=factor)
