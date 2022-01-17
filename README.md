@@ -1,1 +1,1 @@
-# bsc_project
+# Bachelor's project
